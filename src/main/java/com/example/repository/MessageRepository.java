@@ -7,8 +7,6 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer> {
-    
-    public Message findMessageByID(int id);
 
     public List<Message> findAllMessagesByPosted_By(int posted_by);
 }

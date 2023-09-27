@@ -4,18 +4,12 @@ import com.example.entity.Account;
 import com.example.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AccountService {
-    
-    AccountRepository accountRepository;
     @Autowired
-    public AccountService(AccountRepository accountRepository){
-        this.accountRepository = accountRepository;
-    }
+    AccountRepository accountRepository;
 
     /*
      * Register a new account
@@ -36,9 +30,12 @@ public class AccountService {
 
 
      public Account login(Account acc){
-        Account b = accountRepository.findByUsername(acc.getUsername());
-        if(b != null && acc.equals(b)) return b;
-        else return null;
+        Optional<Account> b = Optional.of(accountRepository.findByUsername(acc.getUsername()) );
+        if(b.isPresent() && acc.equals(b.get())){
+            return b.get();
+        }
+        return null;
+        
      }
 
 }
