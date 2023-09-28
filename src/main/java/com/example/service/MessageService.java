@@ -12,10 +12,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MessageService {
-    @Autowired
+    
     MessageRepository messageRepository;
-    @Autowired
     AccountRepository accountRepository;
+    
+    @Autowired
+    public MessageService(MessageRepository m, AccountRepository a){
+        this.accountRepository = a;
+        this.messageRepository = m;
+    }
 
     public List<Message> getAllMessages(){
         return messageRepository.findAll();
@@ -24,17 +29,19 @@ public class MessageService {
     public Message addNewMessage(Message m){
         if(m.getMessage_text().length() > 0 && 
         m.getMessage_text().length() < 255 &&
-        accountRepository.findById(m.getPosted_by())!= null ){
+        accountRepository.existsById(m.getPosted_by()) ){
             return messageRepository.save(m);
         }
         else return null;
     }
 
     public Message getMessageById(int id){
-        return messageRepository.findById(id).get();
+        Optional<Message> opt =  messageRepository.findById(id);
+        return opt.isPresent()? opt.get() : null;
     }
 
     public int deleteMessageById(int id){
+        if(!messageRepository.existsById(id)) return 0;
         int before = (int)messageRepository.count();
         messageRepository.deleteById(id);
         int after = (int)messageRepository.count();
@@ -42,6 +49,8 @@ public class MessageService {
     }
 
     public int updateMessage(int id, String message_text){
+        if(message_text.length() ==0 || message_text.length() >  255) return 0;
+
         Optional<Message> mess = messageRepository.findById(id);
         if(mess.isPresent()){
             Message m = mess.get();
@@ -53,7 +62,7 @@ public class MessageService {
     }
 
     public List<Message> getAllMessagesById(int id){
-        return messageRepository.findAllMessagesByPosted_By(id);
+        return messageRepository.messagesPostedBy(id);
     }
 
 

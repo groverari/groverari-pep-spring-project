@@ -8,8 +8,12 @@ import java.util.Optional;
 
 @Service
 public class AccountService {
-    @Autowired
+    
     AccountRepository accountRepository;
+    @Autowired
+    public AccountService(AccountRepository a){
+        this.accountRepository = a;
+    }
 
     /*
      * Register a new account
@@ -23,16 +27,20 @@ public class AccountService {
      public Account register(Account acc){
         if(acc.getPassword().length() >4 && 
         acc.getUsername().length()> 0 && 
-        accountRepository.findByUsername(acc.getUsername()) == null) 
+         !accountRepository.existsByUsername(acc.getUsername())
+        ) {
             return accountRepository.save(acc);
-        else return null;
+        }
+        return null;
      }
 
 
      public Account login(Account acc){
-        Optional<Account> b = Optional.of(accountRepository.findByUsername(acc.getUsername()) );
-        if(b.isPresent() && acc.equals(b.get())){
-            return b.get();
+        if( accountRepository.existsByUsername(acc.getUsername())){
+            Account db = accountRepository.findByUsername(acc.getUsername());
+            if(db.getUsername().equals(acc.getUsername()) &&
+                db.getPassword().equals(acc.getPassword()))
+                    return db;
         }
         return null;
         
